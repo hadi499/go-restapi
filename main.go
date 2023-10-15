@@ -10,11 +10,13 @@ import (
 func main() {
 	r := gin.Default()
 	database.ConnectDatabase()
+	db := database.DB
+	fileController := &controllers.FileController{DB: db}
 
 	r.GET("/api/posts", controllers.Index)
 	r.GET("/api/posts/:id", controllers.Detail)
-	r.POST("/api/posts", controllers.Create)
-	r.PUT("/api/posts/:id", controllers.Update)
-	r.DELETE("/api/posts", controllers.Delete)
+	r.POST("/api/posts", fileController.Create)
+	r.PUT("/api/posts/:id", fileController.Update)
+	r.DELETE("/api/posts/:id", fileController.Delete)
 	r.Run()
 }
