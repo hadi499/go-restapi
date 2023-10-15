@@ -18,5 +18,8 @@ func main() {
 	r.POST("/api/posts", fileController.Create)
 	r.PUT("/api/posts/:id", fileController.Update)
 	r.DELETE("/api/posts/:id", fileController.Delete)
+	r.POST("/api/register", controllers.Register)
+	r.POST("/api/login", controllers.Login)
+	r.GET("/api/logout", controllers.Logout)
 	r.Run()
 }
