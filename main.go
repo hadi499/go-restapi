@@ -3,8 +3,8 @@ package main
 import (
 	"go-rest-api/controllers"
 	"go-rest-api/database"
-	"go-rest-api/middlewares"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +14,14 @@ func main() {
 	db := database.DB
 	fileController := &controllers.FileController{DB: db}
 
-	r.GET("/api/posts", middlewares.JWTMiddleware(), controllers.Index)
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"*"} // Ubah sesuai kebutuhan Anda
+	r.Use(cors.New(config))
+
+	r.Static("/uploads", "./uploads")
+
+	// r.GET("/api/posts", middlewares.JWTMiddleware(), controllers.Index)
+	r.GET("/api/posts", controllers.Index)
 	r.GET("/api/posts/:id", controllers.Detail)
 	r.POST("/api/posts", fileController.Create)
 	r.PUT("/api/posts/:id", fileController.Update)
