@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -21,13 +22,17 @@ func Register(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
+	email := user.Email
+	if govalidator.IsEmail(email) {
+		// hash pass menggunakan bcrypt
+		hashPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		user.Password = string(hashPassword)
+		database.DB.Create(&user)
+		c.JSON(http.StatusOK, gin.H{"message": "register berhasil"})
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "email salah"})
+	}
 
-	// hash pass menggunakan bcrypt
-	hashPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	user.Password = string(hashPassword)
-
-	database.DB.Create(&user)
-	c.JSON(http.StatusOK, gin.H{"user": user})
 }
 
 func Login(c *gin.Context) {
